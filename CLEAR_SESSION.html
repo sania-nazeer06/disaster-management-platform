@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Session - Disaster Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        .details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+            color: #495057;
+        }
+        .details ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .details li {
+            margin: 5px 0;
+        }
+        .instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Clear Session & Fix Login</h1>
+        
+        <div class="instructions">
+            <h3>⚠️ Important: Follow These Steps</h3>
+            <ol>
+                <li><strong>Close ALL browser tabs/windows</strong> with localhost:3002 open</li>
+                <li>Click the <strong>"Clear Session Now"</strong> button below</li>
+                <li>Open a <strong>NEW browser tab</strong></li>
+                <li>Go to: <code>http://localhost:3002/login</code></li>
+                <li>Login with:
+                    <ul>
+                        <li>Email: <code>student@test.com</code></li>
+                        <li>Password: <code>test123</code></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <button onclick="clearEverything()" style="font-size: 18px; padding: 20px 40px;">
+            🗑️ Clear Session Now
+        </button>
+
+        <div id="status" style="display:none;"></div>
+        <div id="details" class="details" style="display:none;">
+            <strong>✅ Cleared Items:</strong>
+            <ul id="actionList"></ul>
+        </div>
+
+        <div id="nextSteps" style="display:none; margin-top: 20px;">
+            <button onclick="openLogin()" style="background: #28a745; font-size: 18px;">
+                ✅ Open Login Page
+            </button>
+            <button onclick="location.reload()" class="secondary">
+                🔄 Clear Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function logAction(action) {
+            const list = document.getElementById('actionList');
+            const li = document.createElement('li');
+            li.textContent = action;
+            list.appendChild(li);
+        }
+
+        function clearEverything() {
+            const statusDiv = document.getElementById('status');
+            const detailsDiv = document.getElementById('details');
+            const nextStepsDiv = document.getElementById('nextSteps');
+            const actionList = document.getElementById('actionList');
+            
+            // Clear previous results
+            actionList.innerHTML = '';
+            
+            // Show status
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status';
+            statusDiv.innerHTML = '<h3>🧹 Cleaning up...</h3>';
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            // Clear localStorage
+            try {
+                const localKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    localKeys.push(localStorage.key(i));
+                }
+                localStorage.clear();
+                if (localKeys.length > 0) {
+                    logAction(`localStorage: Removed ${localKeys.length} items (${localKeys.join(', ')})`);
+                } else {
+                    logAction(`localStorage: Already empty`);
+                }
+                successCount++;
+            } catch (e) {
+                logAction(`❌ localStorage: ${e.message}`);
+                errorCount++;
+            }
+
+            // Clear sessionStorage
+            try {
+                const sessionKeys = [];
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    sessionKeys.push(sessionStorage.key(i));
+                }
+                sessionStorage.clear();
+                if (sessionKeys.length > 0) {
+                    logAction(`sessionStorage: Removed ${sessionKeys.length} items (${sessionKeys.join(', ')})`);
+                } else {
+                    logAction(`sessionStorage: Already empty`);
+                }
+                successCount++;
+            } catch (e) {
+                logAction(`❌ sessionStorage: ${e.message}`);
+                errorCount++;
+            }
+
+            // Clear cookies
+            try {
+                const cookies = document.cookie.split(";");
+                let cookieCount = 0;
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i];
+                    const eqPos = cookie.indexOf("=");
+                    const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                    if (name) {
+                        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+                        cookieCount++;
+                    }
+                }
+                if (cookieCount > 0) {
+                    logAction(`Cookies: Cleared ${cookieCount} cookies`);
+                } else {
+                    logAction(`Cookies: No cookies found`);
+                }
+                successCount++;
+            } catch (e) {
+                logAction(`❌ Cookies: ${e.message}`);
+                errorCount++;
+            }
+
+            // Clear IndexedDB (if any)
+            try {
+                if (window.indexedDB && window.indexedDB.databases) {
+                    window.indexedDB.databases().then(dbs => {
+                        dbs.forEach(db => {
+                            window.indexedDB.deleteDatabase(db.name);
+                        });
+                        if (dbs.length > 0) {
+                            logAction(`IndexedDB: Deleted ${dbs.length} databases`);
+                        }
+                    });
+                }
+                successCount++;
+            } catch (e) {
+                // IndexedDB might not be available
+            }
+
+            // Show results
+            setTimeout(() => {
+                detailsDiv.style.display = 'block';
+                nextStepsDiv.style.display = 'block';
+                
+                if (errorCount === 0) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = `
+                        <h2>✅ Session Cleared Successfully!</h2>
+                        <p>All authentication tokens have been removed.</p>
+                        <p style="margin-top:10px; font-size:14px;">Now close ALL browser tabs with localhost:3002, then click "Open Login Page" below.</p>
+                    `;
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `
+                        <h2>⚠️ Partial Success</h2>
+                        <p>Some items were cleared, but ${errorCount} errors occurred.</p>
+                        <p>Try refreshing this page and clearing again.</p>
+                    `;
+                }
+            }, 500);
+        }
+
+        function openLogin() {
+            // Open in new tab
+            window.open('http://localhost:3002/login', '_blank');
+            // Also navigate current tab
+            setTimeout(() => {
+                window.location.href = 'http://localhost:3002/login';
+            }, 1000);
+        }
+
+        // Show warning on load
+        window.onload = function() {
+            console.log('%c⚠️ CLEAR SESSION TOOL ⚠️', 'font-size: 20px; color: red; font-weight: bold;');
+            console.log('This page will clear all localStorage, sessionStorage, and cookies.');
+            console.log('Click the button to proceed.');
+        };
+    </script>
+</body>
+</html>
